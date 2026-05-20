@@ -9,7 +9,8 @@ Contract simpel buat deploy di **Base mainnet**. Cocok buat claim role **"Contra
 ```
 hello-base-contract/
 ├── contracts/
-│   └── HelloBase.sol      ← Smart contract utama
+│   ├── HelloBase.sol        ← Smart contract pertama
+│   └── BridgingToBase.sol   ← Smart contract kedua
 ├── scripts/
 │   └── deploy.js           ← Script deploy
 ├── hardhat.config.js       ← Config Hardhat + Base network
