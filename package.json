@@ -1,0 +1,17 @@
+{
+  "name": "hello-base-contract",
+  "version": "1.0.0",
+  "description": "Simple contract to deploy on Base mainnet",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "deploy": "npx hardhat run scripts/deploy.js --network base",
+    "verify": "npx hardhat verify --network base"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.0"
+  }
+}
