@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 /**
  * @title HelloBase
  * @notice Simple contract to prove deployment on Base mainnet
+ * @dev Built for Base Builders guild role verification
  */
 contract HelloBase {
     string public message;
