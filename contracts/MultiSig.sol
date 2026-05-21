@@ -1,13 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
+import "../interfaces/IMultiSig.sol";
+
 /**
  * @title MultiSig
  * @notice Multi-signature wallet with dynamic signer management
  * @dev Requires N-of-M signers to confirm before execution;
- *      supports adding/removing signers and revoking confirmations
+ *      supports adding/removing signers and revoking confirmations.
+ *      Implements ERC-165 for interface detection.
  */
-contract MultiSig {
+contract MultiSig is ERC165 {
     address[] public signers;
     uint256 public required;
     uint256 public signerCount;
@@ -55,6 +59,11 @@ contract MultiSig {
         }
         signerCount = signers_.length;
         required = required_;
+    }
+
+    /// @inheritdoc ERC165
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return interfaceId == type(IMultiSig).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /**

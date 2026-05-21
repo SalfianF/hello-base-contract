@@ -2,13 +2,16 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
+import "../interfaces/IVault.sol";
 
 /**
  * @title Vault
  * @notice Simple ETH vault for depositing and withdrawing funds
- * @dev Uses ReentrancyGuard to protect against reentrancy attacks on withdrawals
+ * @dev Uses ReentrancyGuard to protect against reentrancy attacks on withdrawals.
+ *      Implements ERC-165 for interface detection.
  */
-contract Vault is ReentrancyGuard {
+contract Vault is ReentrancyGuard, ERC165 {
     mapping(address => uint256) private _balances;
     address public owner;
 
@@ -17,6 +20,11 @@ contract Vault is ReentrancyGuard {
 
     constructor() {
         owner = msg.sender;
+    }
+
+    /// @inheritdoc ERC165
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return interfaceId == type(IVault).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /**

@@ -4,13 +4,15 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable2Step.sol";
+import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
+import "../interfaces/ITokenSwap.sol";
 
 /**
  * @title TokenSwap
  * @notice Peer-to-peer token swap order book with security hardening
- * @dev Uses ReentrancyGuard, Ownable2Step, and includes cancelOrder + deadline features
+ * @dev Uses ReentrancyGuard, Ownable2Step, ERC-165; includes cancelOrder + deadline features
  */
-contract TokenSwap is ReentrancyGuard, Ownable2Step {
+contract TokenSwap is ReentrancyGuard, Ownable2Step, ERC165 {
     struct SwapOrder {
         address maker;
         address tokenIn;
@@ -42,6 +44,11 @@ contract TokenSwap is ReentrancyGuard, Ownable2Step {
      * @dev Sets deployer as owner via Ownable2Step
      */
     constructor() Ownable2Step() Ownable(msg.sender) {}
+
+    /// @inheritdoc ERC165
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return interfaceId == type(ITokenSwap).interfaceId || super.supportsInterface(interfaceId);
+    }
 
     /**
      * @notice Create a new swap order
