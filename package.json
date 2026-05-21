@@ -4,8 +4,14 @@
   "description": "Simple contract to deploy on Base mainnet",
   "scripts": {
     "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
     "deploy": "npx hardhat run scripts/deploy.js --network base",
-    "verify": "npx hardhat verify --network base"
+    "verify": "npx hardhat verify --network base",
+    "lint:sol": "npx solhint \"contracts/**/*.sol\"",
+    "lint:js": "npx prettier --check test/ scripts/",
+    "format": "npx prettier --write \"**/*.{js,sol,json,md}\"",
+    "clean": "npx hardhat clean",
+    "coverage": "npx hardhat coverage"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
