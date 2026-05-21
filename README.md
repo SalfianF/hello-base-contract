@@ -4,15 +4,31 @@ Contract simpel buat deploy di **Base mainnet**. Cocok buat claim role **"Contra
 
 ---
 
-## 📁 Struktur File
+|## 📁 Struktur File
 
 ```
 hello-base-contract/
 ├── contracts/
-│   ├── HelloBase.sol        ← Smart contract pertama
-│   └── BridgingToBase.sol   ← Smart contract kedua
+│   ├── HelloBase.sol        ← Smart contract pertama (deployed ✅)
+│   ├── BridgingToBase.sol   ← Bridge contract kedua (deployed ✅)
+│   ├── SimpleStorage.sol    ← Store & retrieve uint256
+│   ├── Counter.sol          ← Increment/decrement counter
+│   ├── Calculator.sol       ← Add/sub/mul/div calculator
+│   ├── Greeter.sol          ← Customizable greeting with owner
+│   ├── BaseToken.sol        ← ERC20 token with mint & max supply
+│   ├── TokenSwap.sol        ← P2P token swap orderbook
+│   ├── Vault.sol            ← ETH deposit/withdraw vault
+│   ├── BaseNFT.sol          ← ERC721 NFT mintable by owner
+│   └── MultiSig.sol         ← Multi-signature wallet
 ├── scripts/
 │   └── deploy.js           ← Script deploy
+├── test/
+│   ├── test_hello_base.js
+│   ├── test_calculator.js
+│   ├── test_counter.js
+│   ├── test_greeter.js
+│   ├── test_storage.js
+│   └── test_vault.js
 ├── hardhat.config.js       ← Config Hardhat + Base network
 ├── .env.example            ← Template env (isi private key)
 ├── .gitignore
