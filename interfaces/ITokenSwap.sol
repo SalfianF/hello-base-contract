@@ -3,90 +3,57 @@ pragma solidity ^0.8.20;
 
 /**
  * @title ITokenSwap
- * @notice Interface for TokenSwap contract
- * @dev Defines the external functions for a peer-to-peer token swap order book
+ * @notice Interface for TokenSwap contract with cancelOrder and deadline
+ * @dev Defines the external functions with security-hardened features
  */
 interface ITokenSwap {
-    /**
-     * @notice Represents a swap order
-     * @param maker Address of the order creator
-     * @param tokenIn Address of the token the maker provides
-     * @param tokenOut Address of the token the maker wants
-     * @param amountIn Amount of tokenIn to swap
-     * @param amountOut Amount of tokenOut expected in return
-     * @param filled Whether the order has been filled
-     */
     struct SwapOrder {
         address maker;
         address tokenIn;
         address tokenOut;
         uint256 amountIn;
         uint256 amountOut;
+        uint256 deadline;
         bool filled;
+        bool cancelled;
     }
 
-    /**
-     * @notice Emitted when a new order is created
-     * @param orderId Index of the new order
-     * @param maker Address of the order creator
-     * @param tokenIn Address of the token provided
-     * @param tokenOut Address of the token desired
-     * @param amountIn Amount of tokenIn
-     * @param amountOut Amount of tokenOut
-     */
     event OrderCreated(
         uint256 indexed orderId,
         address indexed maker,
         address tokenIn,
         address tokenOut,
         uint256 amountIn,
-        uint256 amountOut
+        uint256 amountOut,
+        uint256 deadline
     );
-
-    /**
-     * @notice Emitted when an order is filled
-     * @param orderId Index of the filled order
-     * @param filler Address of the filler
-     */
     event OrderFilled(uint256 indexed orderId, address indexed filler);
+    event OrderCancelled(uint256 indexed orderId, address indexed maker);
+    event EmergencyWithdrawn(address indexed token, address indexed to, uint256 amount);
 
-    /**
-     * @notice Emitted when an order is cancelled
-     * @param orderId Index of the cancelled order
-     */
-    event OrderCancelled(uint256 indexed orderId);
-
-    /**
-     * @notice Get the contract owner
-     * @return address The owner address
-     */
     function owner() external view returns (address);
-
-    /**
-     * @notice Get a swap order by index
-     * @param orderId Index of the order
-     * @return SwapOrder The order details
-     */
     function orders(uint256 orderId) external view returns (SwapOrder memory);
-
-    /**
-     * @notice Create a new swap order
-     * @param tokenIn Address of the token the maker provides
-     * @param tokenOut Address of the token the maker wants
-     * @param amountIn Amount of tokenIn to swap
-     * @param amountOut Amount of tokenOut expected in return
-     */
-    function createOrder(address tokenIn, address tokenOut, uint256 amountIn, uint256 amountOut) external;
-
-    /**
-     * @notice Fill an existing swap order
-     * @param orderId Index of the order to fill
-     */
-    function fillOrder(uint256 orderId) external;
-
-    /**
-     * @notice Get total number of orders
-     * @return uint256 Order count
-     */
     function orderCount() external view returns (uint256);
+
+    function createOrder(
+        address tokenIn,
+        address tokenOut,
+        uint256 amountIn,
+        uint256 amountOut,
+        uint256 deadline
+    ) external;
+
+    function fillOrder(uint256 orderId) external;
+    function cancelOrder(uint256 orderId) external;
+    function getOrder(uint256 orderId) external view returns (
+        address maker,
+        address tokenIn,
+        address tokenOut,
+        uint256 amountIn,
+        uint256 amountOut,
+        uint256 deadline,
+        bool filled,
+        bool cancelled
+    );
+    function emergencyWithdraw(address token, address to, uint256 amount) external;
 }
