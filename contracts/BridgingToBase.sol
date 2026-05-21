@@ -1,25 +1,27 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import "@openzeppelin/contracts/access/Ownable2Step.sol";
+
 /**
  * @title BridgingToBase
- * @notice Simple on-chain proof of bridging to Base network
- * @dev Stores a message, owner, and deployment timestamp
+ * @notice Simple on-chain proof of bridging to Base network with secure ownership
+ * @dev Uses OpenZeppelin Ownable2Step for two-step ownership transfers
  */
-contract BridgingToBase {
+contract BridgingToBase is Ownable2Step {
     string public message;
-    address public owner;
     uint256 public deployTime;
 
-    event MessageUpdated(address indexed updater, string newMessage);
+    event MessageUpdated(address indexed updater, string indexed oldMessage, string indexed newMessage);
 
     /**
      * @notice Deploy with a welcome message
      * @param _message Initial message (e.g., "Bridged to Base!")
+     * @dev Sets deployer as owner via Ownable2Step, records deployment timestamp
      */
-    constructor(string memory _message) {
+    constructor(string memory _message) Ownable2Step() Ownable(msg.sender) {
+        require(bytes(_message).length > 0, "BridgingToBase: empty message");
         message = _message;
-        owner = msg.sender;
         deployTime = block.timestamp;
     }
 
@@ -28,10 +30,10 @@ contract BridgingToBase {
      * @dev Only callable by the contract owner
      * @param _message New message to store
      */
-    function setMessage(string calldata _message) external {
-        require(msg.sender == owner, "BridgingToBase: only owner");
+    function setMessage(string calldata _message) external onlyOwner {
+        require(bytes(_message).length > 0, "BridgingToBase: empty message");
+        emit MessageUpdated(msg.sender, message, _message);
         message = _message;
-        emit MessageUpdated(msg.sender, _message);
     }
 
     /**
@@ -45,6 +47,6 @@ contract BridgingToBase {
         view
         returns (string memory, address, uint256)
     {
-        return (message, owner, deployTime);
+        return (message, owner(), deployTime);
     }
 }

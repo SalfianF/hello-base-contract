@@ -1,25 +1,26 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import "@openzeppelin/contracts/access/Ownable2Step.sol";
+
 /**
  * @title Greeter
- * @notice A simple greeting contract with owner-only updates
- * @dev Stores a greeting string with owner access control
+ * @notice A simple greeting contract with two-step ownership transfer
+ * @dev Uses OpenZeppelin Ownable2Step for secure ownership management
  */
-contract Greeter {
+contract Greeter is Ownable2Step {
     string private _greeting;
-    address public owner;
 
-    event GreetingChanged(string indexed oldGreeting, string indexed newGreeting);
+    event GreetingChanged(address indexed updater, string indexed oldGreeting, string indexed newGreeting);
 
     /**
      * @notice Set the initial greeting
      * @param greeting_ The initial greeting string
-     * @dev Sets the deployer as owner
+     * @dev Sets the deployer as owner via Ownable2Step constructor
      */
-    constructor(string memory greeting_) {
+    constructor(string memory greeting_) Ownable2Step() Ownable(msg.sender) {
+        require(bytes(greeting_).length > 0, "Greeter: empty greeting");
         _greeting = greeting_;
-        owner = msg.sender;
     }
 
     /**
@@ -35,9 +36,9 @@ contract Greeter {
      * @dev Only callable by the contract owner
      * @param greeting_ The new greeting string
      */
-    function setGreeting(string calldata greeting_) external {
-        require(msg.sender == owner, "Greeter: only owner");
-        emit GreetingChanged(_greeting, greeting_);
+    function setGreeting(string calldata greeting_) external onlyOwner {
+        require(bytes(greeting_).length > 0, "Greeter: empty greeting");
+        emit GreetingChanged(msg.sender, _greeting, greeting_);
         _greeting = greeting_;
     }
 
