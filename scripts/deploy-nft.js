@@ -11,7 +11,7 @@ async function main() {
   console.log("BaseNFT deployed to:", await nft.getAddress());
 
   const MultiSig = await hre.ethers.getContractFactory("MultiSig");
-  const msig = await MultiSig.deploy([], 0);
+  const msig = await MultiSig.deploy([deployer.address], 1);
   await msig.waitForDeployment();
   console.log("MultiSig deployed to:", await msig.getAddress());
 }
