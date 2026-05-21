@@ -116,3 +116,70 @@ task("deploy:hello", "Deploy HelloBase")
     await hello.waitForDeployment();
     console.log("HelloBase:", await hello.getAddress());
   });
+
+// --- New contracts (Batch 2) ---
+
+task("deploy:lending", "Deploy BaseLendingPool")
+  .setAction(async (_, hre) => {
+    const BaseLendingPool = await hre.ethers.getContractFactory("BaseLendingPool");
+    const pool = await BaseLendingPool.deploy();
+    await pool.waitForDeployment();
+    console.log("BaseLendingPool:", await pool.getAddress());
+  });
+
+task("deploy:governor", "Deploy BaseGovernor with mock token")
+  .setAction(async (_, hre) => {
+    const [deployer] = await hre.ethers.getSigners();
+    const MockToken = await hre.ethers.getContractFactory("BaseToken");
+    const token = await MockToken.deploy("GovernanceToken", "GOV");
+    await token.waitForDeployment();
+    console.log("GovernanceToken:", await token.getAddress());
+
+    const BaseGovernor = await hre.ethers.getContractFactory("BaseGovernor");
+    const gov = await BaseGovernor.deploy(
+      await token.getAddress(),
+      50,   // voting period (blocks)
+      hre.ethers.parseEther("1000"), // quorum
+      10    // timelock delay (blocks)
+    );
+    await gov.waitForDeployment();
+    console.log("BaseGovernor:", await gov.getAddress());
+  });
+
+task("deploy:flashloan", "Deploy BaseFlashLoan with 9 bps fee")
+  .setAction(async (_, hre) => {
+    const BaseFlashLoan = await hre.ethers.getContractFactory("BaseFlashLoan");
+    const fl = await BaseFlashLoan.deploy(9); // 0.09% fee
+    await fl.waitForDeployment();
+    console.log("BaseFlashLoan:", await fl.getAddress());
+  });
+
+task("deploy:new-defi", "Deploy all 3 new DeFi contracts")
+  .setAction(async (_, hre) => {
+    const [deployer] = await hre.ethers.getSigners();
+    console.log("Deploying with:", deployer.address);
+
+    const BaseLendingPool = await hre.ethers.getContractFactory("BaseLendingPool");
+    const pool = await BaseLendingPool.deploy();
+    await pool.waitForDeployment();
+    console.log("BaseLendingPool:", await pool.getAddress());
+
+    const MockToken = await hre.ethers.getContractFactory("BaseToken");
+    const token = await MockToken.deploy("GovernanceToken", "GOV");
+    await token.waitForDeployment();
+    console.log("GovernanceToken:", await token.getAddress());
+
+    const BaseGovernor = await hre.ethers.getContractFactory("BaseGovernor");
+    const gov = await BaseGovernor.deploy(
+      await token.getAddress(), 50, hre.ethers.parseEther("1000"), 10
+    );
+    await gov.waitForDeployment();
+    console.log("BaseGovernor:", await gov.getAddress());
+
+    const BaseFlashLoan = await hre.ethers.getContractFactory("BaseFlashLoan");
+    const fl = await BaseFlashLoan.deploy(9);
+    await fl.waitForDeployment();
+    console.log("BaseFlashLoan:", await fl.getAddress());
+
+    console.log("\n✅ All 3 new DeFi contracts deployed!");
+  });
